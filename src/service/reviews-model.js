@@ -8,7 +8,7 @@ import Product from "./products-model.js";
 const Review = sequelize.define(
   "reviews",
   {
-    review_id: {
+    id: {
       type: DataTypes.UUID,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,

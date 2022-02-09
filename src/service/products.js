@@ -28,7 +28,7 @@ productsRouter.post('/', async(req,res,next) => {
      // getting the product by id 
      productsRouter.get('/:product_id', async(req,res,next) => {
         try {
-            const products = await Product.findAll({})
+            const products = await Product.findByPk(req.params.product_id)
             res.send(products)
         } catch (error) {
             
@@ -43,6 +43,15 @@ productsRouter.post('/', async(req,res,next) => {
 
     // delete product
     productsRouter.delete('/:product_id', async(req,res,next) => {
-        
+        try {
+            const newReview = await Product.destroy({
+                where:{
+                id:req.params.product_id
+                }
+            })
+            res.status(204).send()
+        } catch (error) {
+        res.status(500).send({msg:error.message})
+        }
         })
 export default productsRouter

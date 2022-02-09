@@ -26,7 +26,12 @@ reviewsRouter.post('/', async(req,res,next) => {
 
      // getting the review by id 
      reviewsRouter.get('/:review_id', async(req,res,next) => {
-        
+        try {
+            const newReview = await Review.findByPk(req.params.review_id)
+            res.send(newReview)
+        } catch (error) {
+        res.status(500).send({msg:error.message})
+        }
         })
 
           // updating the review info by id 
@@ -37,6 +42,15 @@ reviewsRouter.post('/', async(req,res,next) => {
 
     // delete review
     reviewsRouter.delete('/:review_id', async(req,res,next) => {
-        
+        try {
+            const newReview = await Review.destroy({
+                where:{
+                id:req.params.review_id
+                }
+            })
+            res.status(204).send()
+        } catch (error) {
+        res.status(500).send({msg:error.message})
+        }
         })
 export default reviewsRouter
