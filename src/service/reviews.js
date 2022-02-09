@@ -36,7 +36,20 @@ reviewsRouter.post('/', async(req,res,next) => {
 
           // updating the review info by id 
      reviewsRouter.put('/:review_id', async(req,res,next) => {
-       
+        try {
+            const [success, updatedReview] = await Review.update(req.body,{
+                where:{
+                id:req.params.product_id
+                }
+            })
+
+            if(success)
+            res.status(204).send(updatedReview)
+            else    
+            res.status(404).send({msg:"the review not found"})
+        } catch (error) {
+        res.status(500).send({msg:error.message})
+        }
         })
     
 

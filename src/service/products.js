@@ -1,13 +1,20 @@
 import {Router} from 'express'
 import Product from "./products-model.js";
 import Review from './reviews-model.js';
+import { Op } from 'sequelize';
 const productsRouter = Router()
+
+// Implement search on products by  name, description
+// Implement filters by price range
+// order products in ASC/DESC order
+
 
 // get all the products
 productsRouter.get('/', async(req,res,next) => {
 try {
     const products = await Product.findAll({
-        include:[Review]
+        include:[Review],
+        order:[["createdAt", "DESC"]]
     })
     res.send(products)
 } catch (error) {
@@ -15,6 +22,52 @@ try {
 }
 });
 
+// get with search
+productsRouter.get("/search", async (req, res, next) => {
+    try {
+      console.log({ query: req.query });
+      const products = await Product.findAll({
+        where: {
+          [Op.or]: [
+            {
+              name: {
+                [Op.iLike]: `%${req.query.q}%`
+              },
+            },
+            {
+              description: {
+                [Op.iLike]: `%${req.query.q}%`
+              },
+            },
+            {
+                category: {
+                  [Op.iLike]: `%${req.query.q}%`
+                },
+              },
+            {
+                category: {
+                  [Op.iLike]: `%${req.query.c}%`
+                },
+              },
+              {
+                brand: {
+                  [Op.iLike]: `%${req.query.q}%`
+                },
+              },
+              {
+                price: {
+                  [Op.between]: [0,parseInt(req.query.p)]
+                },
+              },
+          ],
+        },
+        include: [Review],
+      });
+      res.send(products);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  });
 // post new products
 productsRouter.post('/', async(req,res,next) => {
     try {
@@ -29,7 +82,11 @@ productsRouter.post('/', async(req,res,next) => {
      productsRouter.get('/:product_id', async(req,res,next) => {
         try {
             const products = await Product.findByPk(req.params.product_id)
-            res.send(products)
+            if(products)
+                res.send(products)
+                else
+                res.status(404).send({msg:'product not found'})
+
         } catch (error) {
             
         }
@@ -37,7 +94,20 @@ productsRouter.post('/', async(req,res,next) => {
 
           // updating the product info by id 
      productsRouter.put('/:product_id', async(req,res,next) => {
-        
+        try {
+            const [success, updatedProduct] = await Product.update(req.body,{
+                where:{
+                id:req.params.product_id
+                }
+            })
+
+            if(success)
+            res.status(204).send(updatedProduct)
+            else    
+            res.status(404).send({msg:"the product not found"})
+        } catch (error) {
+        res.status(500).send({msg:error.message})
+        }
         })
     
 
