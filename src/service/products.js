@@ -1,11 +1,14 @@
 import {Router} from 'express'
 import Product from "./products-model.js";
+import Review from './reviews-model.js';
 const productsRouter = Router()
 
 // get all the products
 productsRouter.get('/', async(req,res,next) => {
 try {
-    const products = await Product.findAll({})
+    const products = await Product.findAll({
+        include:[Review]
+    })
     res.send(products)
 } catch (error) {
     

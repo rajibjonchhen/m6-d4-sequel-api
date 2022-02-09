@@ -20,6 +20,7 @@ reviewsRouter.post('/', async(req,res,next) => {
         res.send(newReview)
     } catch (error) {
     res.status(500).send({msg:error.message})
+
     }
     })
 
