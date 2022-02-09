@@ -56,7 +56,7 @@ productsRouter.get("/search", async (req, res, next) => {
               },
               {
                 price: {
-                  [Op.between]: [0,parseInt(req.query.p)]
+                  [Op.between]: [0,parseInt(req.query.p)],
                 },
               },
           ],
