@@ -1,0 +1,28 @@
+{
+  "name": "m6-d4-sequel-api",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "prestart": "npm run create-tables",
+    "dev": "nodemon -r dotenv/config ./src/server.js",
+    "create-tables": "node -r dotenv/config ./src/utils/db/create-tables.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rajibjonchhen/m6-d4-sequel-api/issues"
+  },
+  "homepage": "https://github.com/rajibjonchhen/m6-d4-sequel-api#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "pg": "^8.7.3",
+    "sequelize": "^6.16.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.15"
+  }
+}
