@@ -6,7 +6,12 @@ const reviewsRouter = Router()
 // get all the reviews
 reviewsRouter.get('/', async(req,res,next) => {
 try {
-    const reviews = await Review.findAll({})
+    const {offset = 0, limit = 9} = req.query
+    const totalReview =  await Review.count({})
+    const reviews = await Review.findAll({
+        offset,
+        limit
+    })
     res.send(reviews)
 } catch (error) {
     res.status(500).send({msg:error.message})
@@ -15,10 +20,12 @@ try {
 
 
 // post new reviews
-reviewsRouter.post('/:product_id/:user_id', async(req,res,next) => {
+reviewsRouter.post('/:productId/:userId', async(req,res,next) => {
+    console.log(req.params.productId)
+    console.log(req.params.userId)
     try {
         const newReview = await Review.create({
-            ...req.body,productId:req.params.product_id, userId:req.params.user_id})
+            ...req.body,productId:req.params.productId, userId:req.params.userId})
         res.send(newReview)
     } catch (error) {
     res.status(500).send({msg:error.message})
@@ -27,9 +34,9 @@ reviewsRouter.post('/:product_id/:user_id', async(req,res,next) => {
     })
 
      // getting the review by id 
-     reviewsRouter.get('/:review_id', async(req,res,next) => {
+     reviewsRouter.get('/:reviewId', async(req,res,next) => {
         try {
-            const newReview = await Review.findByPk(req.params.review_id)
+            const newReview = await Review.findByPk(req.params.reviewId)
             res.send(newReview)
         } catch (error) {
         res.status(500).send({msg:error.message})
@@ -37,11 +44,11 @@ reviewsRouter.post('/:product_id/:user_id', async(req,res,next) => {
         })
 
           // updating the review info by id 
-     reviewsRouter.put('/:review_id', async(req,res,next) => {
+     reviewsRouter.put('/:reviewId', async(req,res,next) => {
         try {
             const [success, updatedReview] = await Review.update(req.body,{
                 where:{
-                id:req.params.product_id
+                id:req.params.productId
                 }
             })
 
@@ -56,11 +63,11 @@ reviewsRouter.post('/:product_id/:user_id', async(req,res,next) => {
     
 
     // delete review
-    reviewsRouter.delete('/:review_id', async(req,res,next) => {
+    reviewsRouter.delete('/:reviewId', async(req,res,next) => {
         try {
             const newReview = await Review.destroy({
                 where:{
-                id:req.params.review_id
+                id:req.params.reviewId
                 }
             })
             res.status(204).send()

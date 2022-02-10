@@ -6,7 +6,10 @@ const usersRouter = Router()
 
 usersRouter.get('/', async(req,res,next) => {
     try {
-        const users = await User.findAll({})
+        const users = await User.findAll({
+            include:[Review],
+             order:[["createdAt", "DESC"]]
+        })
         res.send(users)
     } catch (error) {
         res.status(500).send({msg:error.message})
@@ -24,9 +27,9 @@ usersRouter.get('/', async(req,res,next) => {
         });
     
          // getting the User by id 
-         usersRouter.get('/:user_id', async(req,res,next) => {
+         usersRouter.get('/:userId', async(req,res,next) => {
             try {
-                const newUser = await User.findByPk(req.params.user_id)
+                const newUser = await User.findByPk(req.params.userId)
                 res.send(newUser)
             } catch (error) {
             res.status(500).send({msg:error.message})
@@ -34,11 +37,11 @@ usersRouter.get('/', async(req,res,next) => {
             });
     
               // updating the User info by id 
-         usersRouter.put('/:user_id', async(req,res,next) => {
+         usersRouter.put('/:userId', async(req,res,next) => {
             try {
                 const [success, updatedUser] = await User.update(req.body,{
                     where:{
-                    id:req.params.user_id
+                    id:req.params.userId
                     }
                 })
     
@@ -53,11 +56,11 @@ usersRouter.get('/', async(req,res,next) => {
         
     
         // delete User
-        usersRouter.delete('/:user_id', async(req,res,next) => {
+        usersRouter.delete('/:userId', async(req,res,next) => {
             try {
                 const newUser = await User.destroy({
                     where:{
-                    id:req.params.user_id
+                    id:req.params.userId
                     }
                 })
                 res.status(204).send()

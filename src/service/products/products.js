@@ -2,7 +2,7 @@ import {Router} from 'express'
 import Product from "./products-model.js";
 import Review from '../reviews/reviews-model.js';
 import sequelize,{ Op } from 'sequelize';
-
+import Category from '../category/category-model.js';
 const productsRouter = Router()
 
 // Implement search on products by  name, description
@@ -14,7 +14,10 @@ const productsRouter = Router()
 productsRouter.get('/', async(req,res,next) => {
 try {
     const products = await Product.findAll({
-        include:[Review],
+        include:[Review,
+           {
+          model:Category,
+        attributes:['name']}],
         order:[["createdAt", "DESC"]]
     })
     res.send(products)
@@ -80,13 +83,13 @@ productsRouter.get("/search", async (req, res, next) => {
           [
             sequelize.cast(
               // cast function converts datatype
-              sequelize.fn("count", sequelize.col("product_id")), // SELECT COUNT(blog_id) AS total_comments
+              sequelize.fn("count", sequelize.col("productId")), // SELECT COUNT(productId) AS total_comments
               "integer"
             ),
             "numberOfReviews",
           ],
         ],
-        group: ["product_id", "product.id"],
+        group: ["productId", "product.id"],
         include: [{ model: Product}], // <-- nested include
       });
       res.send(stats);
@@ -94,37 +97,88 @@ productsRouter.get("/search", async (req, res, next) => {
       res.status(500).send({ message: error.message });
     }
   });
-  
-// post new products
-productsRouter.post('/', async(req,res,next) => {
+
+   // getting the product by id 
+   productsRouter.get('/:productId', async(req,res,next) => {
     try {
-        const newProduct = await Product.create(req.body)
-        res.send(newProduct)
+        const products = await Product.findByPk(req.params.productId)
+        if(products)
+            res.send(products)
+            else
+            res.status(404).send({msg:'product not found'})
+
     } catch (error) {
-        res.status(500).send({msg:error.message})
+        
     }
     })
 
-     // getting the product by id 
-     productsRouter.get('/:product_id', async(req,res,next) => {
-        try {
-            const products = await Product.findByPk(req.params.product_id)
-            if(products)
-                res.send(products)
-                else
-                res.status(404).send({msg:'product not found'})
+// post new products
+productsRouter.post('/', async(req,res,next) => {
+   try {
+    const newProduct = await Product.create(req.body);
+    if (req.body.categories) {
+      for await (const categoryName of req.body.categories) {
+        const category = await Category.create({ name: categoryName });
+        await newProduct.addCategory(category, {
+          through: { selfGranted: false },
+        });
+      }
+    }
+    // and add to product
+    /*this will go and insert relationship to product_categories table*/
+    /*find product by id and join Category,Review tables*/
+    const productWithCategory = await Product.findOne({
+      where: { id: newProduct.id },
+      include: [Category, Review],
+    });
+    res.send(productWithCategory);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-        } catch (error) {
-            
-        }
-        })
 
-          // updating the product info by id 
-     productsRouter.put('/:product_id', async(req,res,next) => {
+productsRouter.post("/:productId/review", async (req, res, next) => {
+  try {
+    const newReview = await Review.create({
+      ...req.body,
+      productId: req.params.productId,
+    });
+    res.send(newReview);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+
+  //to add product category
+  productsRouter.post("/:productId/category", async (req, res, next) => {
+    try {
+      // find the product that you want to add category
+      const product = await Product.findByPk(req.params.productId);
+      console.log("req.params.productId",req.params.productId)
+      if (product) {
+        // create the category
+        const category = await Category.create(req.body);
+        // and add to product
+        /*this will go and insert relationship to product_categories table*/
+        await product.addCategory(category, { through: { selfGranted: false } });
+        /*find product by id and join Category,Review tables*/
+        res.send(category);
+      } else {
+        res.status(404).send({ error: "Product not found" });
+      }
+    } catch (error) {
+      res.status(500).send({ error: error.message });
+    }
+  });
+
+    // updating the product info by id 
+     productsRouter.put('/:productId', async(req,res,next) => {
         try {
             const [success, updatedProduct] = await Product.update(req.body,{
                 where:{
-                id:req.params.product_id
+                id:req.params.productId
                 }
             })
 
@@ -139,11 +193,11 @@ productsRouter.post('/', async(req,res,next) => {
     
 
     // delete product
-    productsRouter.delete('/:product_id', async(req,res,next) => {
+    productsRouter.delete('/:productId', async(req,res,next) => {
         try {
             const newReview = await Product.destroy({
                 where:{
-                id:req.params.product_id
+                id:req.params.productId
                 }
             })
             res.status(204).send()

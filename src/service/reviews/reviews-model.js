@@ -30,6 +30,9 @@ Review.belongsTo(Product)
 Product.hasMany(Review,{
     onDelete:"CASCADE"
 })
-
+Review.belongsTo(User)
+User.hasMany(Review,{
+    onDelete:"CASCADE"
+})
 
 export default Review;
