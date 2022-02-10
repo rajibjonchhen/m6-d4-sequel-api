@@ -1,7 +1,8 @@
 import {Router} from 'express'
 import Product from "./products-model.js";
 import Review from '../reviews/reviews-model.js';
-import { Op } from 'sequelize';
+import sequelize,{ Op } from 'sequelize';
+
 const productsRouter = Router()
 
 // Implement search on products by  name, description
@@ -22,32 +23,11 @@ try {
 }
 });
 
-productsRouter.get("/stats", async (req, res, next) => {
-  try {
-    const stats = await Product.findAll({
-      // select list : what you want to get ?
-      attributes: [
-        [
-          sequelize.cast(
-            // cast function converts datatype
-            sequelize.fn("count", sequelize.col("product_id")), // SELECT COUNT(blog_id) AS total_comments
-            "integer"
-          ),
-          "numberOfComments",
-        ],
-      ],
-      group: ["product_id", "product.id", "product.review.id"],
-      include: [{ model: Product, include: [Review] }], // <-- nested include
-    });
-    res.send(stats);
-  } catch (error) {
-    res.status(500).send({ message: error.message });
-  }
-});
+
 // get with search
 productsRouter.get("/search", async (req, res, next) => {
-    try {
-      console.log({ query: req.query });
+  try {
+      console.log(req.query)
       const products = await Product.findAll({
         where: {
           [Op.or]: [
@@ -78,7 +58,7 @@ productsRouter.get("/search", async (req, res, next) => {
               },
               {
                 price: {
-                  [Op.between]: [0,parseInt(req.query.p)],
+                  [Op.between]: [0,parseInt(req.query.q)],
                 },
               },
           ],
@@ -86,6 +66,30 @@ productsRouter.get("/search", async (req, res, next) => {
         include: [Review],
       });
       res.send(products);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  });
+
+  //stats
+  productsRouter.get("/stats", async (req, res, next) => {
+    try {
+      const stats = await Review.findAll({
+        // select list : what you want to get ?
+        attributes: [
+          [
+            sequelize.cast(
+              // cast function converts datatype
+              sequelize.fn("count", sequelize.col("product_id")), // SELECT COUNT(blog_id) AS total_comments
+              "integer"
+            ),
+            "numberOfReviews",
+          ],
+        ],
+        group: ["product_id", "product.id"],
+        include: [{ model: Product}], // <-- nested include
+      });
+      res.send(stats);
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
