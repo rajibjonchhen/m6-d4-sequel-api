@@ -94,6 +94,7 @@ productsRouter.get("/search", async (req, res, next) => {
       res.status(500).send({ message: error.message });
     }
   });
+  
 // post new products
 productsRouter.post('/', async(req,res,next) => {
     try {

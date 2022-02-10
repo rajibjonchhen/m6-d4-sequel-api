@@ -26,6 +26,6 @@ const Category = sequelize.define(
 // through is the join table (3rd table)
 
 Category.belongsToMany(Product, { through: "product_categories" });
-Blog.belongsToMany(Category, { through: "product_categories" });
+Product.belongsToMany(Category, { through: "product_categories" });
 
 export default Category;

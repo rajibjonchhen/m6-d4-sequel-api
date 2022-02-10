@@ -29,7 +29,11 @@ categoryRouter.post('/', async(req,res,next) => {
      categoryRouter.get('/:category_id', async(req,res,next) => {
         try {
             const newCategory = await Category.findByPk(req.params.category_id)
+            if(newCategory)
             res.send(newCategory)
+            else
+            res.status(404).send({msg:'category name with that id not found'})
+
         } catch (error) {
         res.status(500).send({msg:error.message})
         }
@@ -40,7 +44,7 @@ categoryRouter.post('/', async(req,res,next) => {
         try {
             const [success, updatedCategory] = await Category.update(req.body,{
                 where:{
-                id:req.params.product_id
+                id:req.params.category_id
                 }
             })
 

@@ -5,6 +5,7 @@ import listEndpoints from 'express-list-endpoints'
 import productsRouter from './service/products/products.js'
 import reviewsRouter from './service/reviews/reviews.js'
 import usersRouter from './service/users/users.js'
+import categoryRouter from './service/category/category.js'
 
 const server = express()
 
@@ -15,6 +16,7 @@ server.use(express.json())
 server.use('/products',productsRouter)
 server.use('/reviews',reviewsRouter)
 server.use('/users',usersRouter)
+server.use('/category', categoryRouter)
 server.listen(PORT, ()=> {
     authenticateDatabase()
     console.log("server has is running ",PORT)
