@@ -4,16 +4,18 @@ import sequelize from "../../utils/db/connect.js";
 
 import Sequelize from "sequelize";
 
-const Product = sequelize.define(
-  "category",
-  {  
+import Product from "../products/products-model.js";
+
+const Category = sequelize.define(
+  "categories",
+  {
     id: {
       type: DataTypes.UUID,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
       primaryKey: true,
     },
-    category:{
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -21,4 +23,9 @@ const Product = sequelize.define(
   { underscored: true }
 );
 
-export default Product;
+// through is the join table (3rd table)
+
+Category.belongsToMany(Product, { through: "product_categories" });
+Blog.belongsToMany(Category, { through: "product_categories" });
+
+export default Category;

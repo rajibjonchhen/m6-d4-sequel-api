@@ -22,6 +22,28 @@ try {
 }
 });
 
+productsRouter.get("/stats", async (req, res, next) => {
+  try {
+    const stats = await Product.findAll({
+      // select list : what you want to get ?
+      attributes: [
+        [
+          sequelize.cast(
+            // cast function converts datatype
+            sequelize.fn("count", sequelize.col("product_id")), // SELECT COUNT(blog_id) AS total_comments
+            "integer"
+          ),
+          "numberOfComments",
+        ],
+      ],
+      group: ["product_id", "product.id", "product.review.id"],
+      include: [{ model: Product, include: [Review] }], // <-- nested include
+    });
+    res.send(stats);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
 // get with search
 productsRouter.get("/search", async (req, res, next) => {
     try {

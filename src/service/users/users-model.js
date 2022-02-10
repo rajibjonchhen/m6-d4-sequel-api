@@ -5,7 +5,7 @@ import Review from '../reviews/reviews-model.js';
 
 
 const User = sequelize.define(
-  "user",
+  "users",
   {
     id: {
       type: DataTypes.UUID,
@@ -31,7 +31,10 @@ const User = sequelize.define(
   },
   { underscored: true }
 );
-
+// Review.belongsTo(User)
+// User.hasMany(Review,{
+//     onDelete:"CASCADE"
+// })
 
 
 export default User;
