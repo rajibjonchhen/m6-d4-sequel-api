@@ -14,9 +14,10 @@ try {
 });
 
 // post new reviews
-reviewsRouter.post('/', async(req,res,next) => {
+reviewsRouter.post('/:product_id/:user_id', async(req,res,next) => {
     try {
-        const newReview = await Review.create(req.body)
+        const newReview = await Review.create({
+            ...req.body,productId:req.params.product_id, userId:req.params.user_id})
         res.send(newReview)
     } catch (error) {
     res.status(500).send({msg:error.message})

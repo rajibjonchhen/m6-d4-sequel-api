@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 
-import sequelize from "../utils/db/connect.js";
+import sequelize from "../../utils/db/connect.js";
 
 import Sequelize from "sequelize";
 
