@@ -1,7 +1,7 @@
 
 import Sequelize from "sequelize";
 
-const { Database_URL, NODE_ENV} = process.env;
+const { DATABASE_URL, NODE_ENV} = process.env;
 
 const isServerProduction = NODE_ENV === "production"
 const sslOption = isServerProduction?   {dialectOptions: {         // IMPORTANT
@@ -10,7 +10,7 @@ const sslOption = isServerProduction?   {dialectOptions: {         // IMPORTANT
     rejectUnauthorized: false,
   },
 }}:{}
-const sequelize = new Sequelize(Database_URL, {
+const sequelize = new Sequelize(DATABASE_URL, {
   dialect: "postgres",
   ...sslOption
 });
