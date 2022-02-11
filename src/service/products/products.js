@@ -13,7 +13,7 @@ const productsRouter = Router()
 // order products in ASC/DESC order
 
 
-// get all the products
+// ***********************  get all the products *********************** 
 productsRouter.get('/', async(req,res,next) => {
 try {
     const products = await Product.findAll({
@@ -30,7 +30,7 @@ try {
 });
 
 
-// get with search
+// ***********************  get with search *********************** 
 productsRouter.get("/search", async (req, res, next) => {
   try {
       console.log(req.query)
@@ -77,7 +77,7 @@ productsRouter.get("/search", async (req, res, next) => {
     }
   });
 
-  //stats
+  //***********************  stats *********************** 
   productsRouter.get("/stats", async (req, res, next) => {
     try {
       const stats = await Review.findAll({
@@ -101,7 +101,7 @@ productsRouter.get("/search", async (req, res, next) => {
     }
   });
 
-   // getting the product by id 
+   // ***********************  getting the product by id *********************** 
    productsRouter.get('/:productId', async(req,res,next) => {
     try {
         const products = await Product.findOne({
@@ -120,7 +120,7 @@ productsRouter.get("/search", async (req, res, next) => {
     }
     })
 
-// post new products with multiple categories
+// ***********************  post new products with multiple categories *********************** 
 productsRouter.post('/', async(req,res,next) => {
    try {
     const newProduct = await Product.create(req.body);
@@ -146,6 +146,7 @@ productsRouter.post('/', async(req,res,next) => {
 });
 
 
+// ***********************  post product review *********************** 
 productsRouter.post("/:productId/review", async (req, res, next) => {
   try {
     const newReview = await Review.create({
@@ -159,7 +160,7 @@ productsRouter.post("/:productId/review", async (req, res, next) => {
 });
 
 
-  //to add product category
+  //***********************  to add product category *********************** 
   productsRouter.post("/:productId/category", async (req, res, next) => {
     try {
       // find the product that you want to add category
@@ -180,7 +181,8 @@ productsRouter.post("/:productId/review", async (req, res, next) => {
       res.status(500).send({ error: error.message });
     }
   });
-// putting in the cart
+
+// ***********************  putting in the cart *********************** 
 productsRouter.post('/:userId/cart' , async(req, res, next) => {
   try {
     const user = await User.findByPk(req.params.userId)
@@ -199,7 +201,7 @@ productsRouter.post('/:userId/cart' , async(req, res, next) => {
     
   }
 })
-  // getting the items in the cart
+  // ***********************  getting the items in the cart *********************** 
   productsRouter.get('/:userId/cart', async(req, res, next)=> {
     try {
       const totalItems = await Cart.count({
@@ -214,7 +216,7 @@ productsRouter.post('/:userId/cart' , async(req, res, next) => {
       if(user){
         const cart = await Cart.findAll({
           where :{userId:req.params.userId},
-          include :[Product],
+          include :[Product, User],
           attributes : [
             [
               sequelize.cast(sequelize.fn("count",sequelize.col("product.id")),"integer"),
@@ -235,7 +237,46 @@ productsRouter.post('/:userId/cart' , async(req, res, next) => {
       res.status(500).send({msg:error.message})
     }
   })
-    // updating the product info by id 
+
+  // *********************** removing the item in the cart ***********************
+productsRouter.put('/:userId/cart' , async(req, res, next) => {
+  try {
+    const product = await Cart.findOne({
+      where:{
+        id:req.body.productId
+      },
+    })
+    if(product){
+      const newReview = await Cart.destroy({
+          where:{
+          productId:req.body.productId
+          }
+      })
+      res.status(204).send()
+    } else {
+      res.status(404).send({msg:"product not in the cart"})
+    }
+} catch (error) {
+res.status(500).send({msg:error.message})
+}
+})
+
+
+  // *************************** delete in the cart *******************************
+  productsRouter.delete('/:userId/cart' , async(req, res, next) => {
+    try {
+      const newReview = await Cart.destroy({
+          where:{
+          userId:req.params.userId
+          }
+      })
+      res.status(204).send()
+  } catch (error) {
+  res.status(500).send({msg:error.message})
+  }
+  })
+  
+    //***********************  updating the product info by id *********************** 
      productsRouter.put('/:productId', async(req,res,next) => {
         try {
             const [success, updatedProduct] = await Product.update(req.body,{
@@ -254,7 +295,7 @@ productsRouter.post('/:userId/cart' , async(req, res, next) => {
         })
     
 
-    // delete product
+    // ***********************  delete product *********************** 
     productsRouter.delete('/:productId', async(req,res,next) => {
         try {
             const newReview = await Product.destroy({

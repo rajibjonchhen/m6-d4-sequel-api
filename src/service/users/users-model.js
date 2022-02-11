@@ -32,6 +32,7 @@ const User = sequelize.define(
   },
   { underscored: true }
 );
+
 Cart.belongsTo(User)
 Cart.belongsTo(Product)
 

@@ -14,6 +14,15 @@ const {PORT =5001} = process.env
 
 server.use(express.json())
 
+const whiteListOrigins = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
+console.table(whiteListOrigins)
+server.use(cors({origin:function(origin, next){
+    if(!origin || whiteListOrigins.indexOf(origin) != -1)
+    next(null, true)
+    else
+    next( new Error('Cors error'))
+} }))
+
 server.use('/products',productsRouter)
 server.use('/reviews',reviewsRouter)
 server.use('/users',usersRouter)

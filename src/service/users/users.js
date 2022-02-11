@@ -1,6 +1,7 @@
 import { Router } from "express";
 import User from "./users-model.js";
 import Review from '../reviews/reviews-model.js';
+import Cart from "../products/cart-model.js";
 
 const usersRouter = Router()
 
