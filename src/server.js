@@ -13,6 +13,7 @@ const {PORT =5001} = process.env
 //const result = await pool.query("SELECT NOW();")
 
 server.use(express.json())
+
 server.use('/products',productsRouter)
 server.use('/reviews',reviewsRouter)
 server.use('/users',usersRouter)
