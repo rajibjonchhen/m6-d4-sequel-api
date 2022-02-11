@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "prestart": "npm run create-tables",
+    "start":"node ./src/server.js",
     "dev": "nodemon -r dotenv/config ./src/server.js",
     "create-tables": "node -r dotenv/config ./src/utils/db/create-tables.js"
   },
