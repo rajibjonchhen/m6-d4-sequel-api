@@ -249,7 +249,7 @@ productsRouter.put('/:userId/cart' , async(req, res, next) => {
     if(product){
       const newReview = await Cart.destroy({
           where:{
-          productId:req.body.productId
+          productId:product.id
           }
       })
       res.status(204).send()
@@ -275,7 +275,7 @@ res.status(500).send({msg:error.message})
   res.status(500).send({msg:error.message})
   }
   })
-  
+
     //***********************  updating the product info by id *********************** 
      productsRouter.put('/:productId', async(req,res,next) => {
         try {

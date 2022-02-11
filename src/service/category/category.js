@@ -7,7 +7,7 @@ const categoryRouter = Router()
 categoryRouter.get('/', async(req,res,next) => {
 try {
     const categories = await Category.findAll({
-        group:["name"]
+        group:["name"],
         include:[Product],
         
     })
