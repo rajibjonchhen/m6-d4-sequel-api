@@ -3,6 +3,9 @@ import Product from "./products-model.js";
 import Review from '../reviews/reviews-model.js';
 import sequelize,{ Op } from 'sequelize';
 import Category from '../category/category-model.js';
+import Cart from './cart-model.js';
+import User from '../users/users-model.js';
+
 const productsRouter = Router()
 
 // Implement search on products by  name, description
@@ -177,7 +180,61 @@ productsRouter.post("/:productId/review", async (req, res, next) => {
       res.status(500).send({ error: error.message });
     }
   });
+// putting in the cart
+productsRouter.post('/:userId/cart' , async(req, res, next) => {
+  try {
+    const user = await User.findByPk(req.params.userId)
+    const product = await Product.findByPk(req.body.productId)
+    if(user && product){
+      const item = await Cart.create({
+        productId : product.id,
+        userId : req.params.userId,
+      })
+      res.status(204).send(item) 
+    } else {
+      res.status(404).send({msg:'invalid user or product id'}) 
 
+    }
+  } catch (error) {
+    
+  }
+})
+  // getting the items in the cart
+  productsRouter.get('/:userId/cart', async(req, res, next)=> {
+    try {
+      const totalItems = await Cart.count({
+        where:{userId:req.params.userId},
+      });
+      const totalPrice = await Cart.sum("product.price",{
+        where:{userId:req.params.userId},
+        include:[{model:Product, attributes:[]}]
+      });
+      const user = await User.findByPk(req.params.userId);
+
+      if(user){
+        const cart = await Cart.findAll({
+          where :{userId:req.params.userId},
+          include :[Product],
+          attributes : [
+            [
+              sequelize.cast(sequelize.fn("count",sequelize.col("product.id")),"integer"),
+              "quantity"
+            ],
+            [
+              sequelize.cast(sequelize.fn("sum",sequelize.col("product.price")),"integer"),
+              "total_per_item"
+            ],
+          ] ,
+          group : ["product.id"]
+        });
+        res.status(200).send({totalItems, totalPrice, cart});
+      } else { 
+        res.status(400).send({msg:"invalid user id or product id"})
+      }
+    } catch (error) {
+      res.status(500).send({msg:error.message})
+    }
+  })
     // updating the product info by id 
      productsRouter.put('/:productId', async(req,res,next) => {
         try {

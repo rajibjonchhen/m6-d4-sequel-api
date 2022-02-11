@@ -1,7 +1,8 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../../utils/db/connect.js";
 import Sequelize from "sequelize";
-import Review from '../reviews/reviews-model.js';
+import Cart from "../products/cart-model.js";
+import Product from "../products/products-model.js";
 
 
 const User = sequelize.define(
@@ -31,10 +32,8 @@ const User = sequelize.define(
   },
   { underscored: true }
 );
-// Review.belongsTo(User)
-// User.hasMany(Review,{
-//     onDelete:"CASCADE"
-// })
+Cart.belongsTo(User)
+Cart.belongsTo(Product)
 
 
 export default User;
