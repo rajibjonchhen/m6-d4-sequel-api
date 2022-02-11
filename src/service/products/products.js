@@ -101,7 +101,12 @@ productsRouter.get("/search", async (req, res, next) => {
    // getting the product by id 
    productsRouter.get('/:productId', async(req,res,next) => {
     try {
-        const products = await Product.findByPk(req.params.productId)
+        const products = await Product.findOne({
+          where:{
+            id:req.params.productId
+          },
+          include:[Review, Category]
+        })
         if(products)
             res.send(products)
             else
@@ -112,7 +117,7 @@ productsRouter.get("/search", async (req, res, next) => {
     }
     })
 
-// post new products
+// post new products with multiple categories
 productsRouter.post('/', async(req,res,next) => {
    try {
     const newProduct = await Product.create(req.body);
