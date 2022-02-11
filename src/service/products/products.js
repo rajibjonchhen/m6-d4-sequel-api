@@ -227,7 +227,8 @@ productsRouter.post('/:userId/cart' , async(req, res, next) => {
               "total_per_item"
             ],
           ] ,
-          group : ["product.id"]
+          group : ["product.id"],
+          include:[User]
         });
         res.status(200).send({totalItems, totalPrice, cart});
       } else { 

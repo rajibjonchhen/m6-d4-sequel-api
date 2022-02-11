@@ -1,14 +1,13 @@
 import {Router} from 'express'
 import Category from './category-model.js';
 import Product from '../products/products-model.js';
-import cors from 'cors'
 const categoryRouter = Router()
 
 // get all the Categories
 categoryRouter.get('/', async(req,res,next) => {
 try {
     const categories = await Category.findAll({
-        group:[categories.name],
+        group : [],
         include:[Product],
         
     })

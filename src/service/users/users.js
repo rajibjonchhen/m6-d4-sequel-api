@@ -8,8 +8,10 @@ const usersRouter = Router()
 usersRouter.get('/', async(req,res,next) => {
     try {
         const users = await User.findAll({
-            include:[Review],
-             order:[["createdAt", "DESC"]]
+            // include:[Review],
+            group: ["productId", "product.id"],
+            include: [Review, { model: Product}],
+            order:[["createdAt", "DESC"]]
         })
         res.send(users)
     } catch (error) {
