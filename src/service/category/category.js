@@ -1,6 +1,7 @@
 import {Router} from 'express'
 import Category from './category-model.js';
 import Product from '../products/products-model.js';
+import cors from 'cors'
 const categoryRouter = Router()
 
 // get all the Categories
